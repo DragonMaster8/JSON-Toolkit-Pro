@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>JSON Toolkit Pro | Mock Generator with Random Fields</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+        --primary: #7C3AED;
+        --primary-light: #A78BFA;
+        --primary-dark: #5B21B6;
+        --primary-bg: #F5F3FF;
+        --accent: #059669;
+        --accent-bg: #ECFDF5;
+        --danger: #DC2626;
+        --danger-bg: #FEF2F2;
+        --warn: #D97706;
+        --warn-bg: #FFFBEB;
+        --bg: #F8FAFC;
+        --surface: #FFFFFF;
+        --text: #0F172A;
+        --text-mid: #475569;
+        --text-light: #94A3B8;
+        --border: #E2E8F0;
+        --border-light: #F1F5F9;
+        --code-bg: #1E1E2E;
+        --code-text: #CDD6F4;
+        --code-border: #313244;
+        --navbar-bg: rgba(255,255,255,.85);
+        --radius: 14px;
+        --radius-sm: 10px;
+        --shadow-sm: 0 1px 2px rgba(0,0,0,.05);
+        --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    }
+    [data-theme="dark"] {
+        --primary: #A78BFA;
+        --primary-light: #C4B5FD;
+        --primary-dark: #7C3AED;
+        --primary-bg: rgba(124,58,237,.15);
+        --accent: #34D399;
+        --accent-bg: rgba(5,150,105,.15);
+        --danger: #F87171;
+        --danger-bg: rgba(220,38,38,.15);
+        --warn: #FBBF24;
+        --warn-bg: rgba(217,119,6,.15);
+        --bg: #0F172A;
+        --surface: #1E293B;
+        --text: #E2E8F0;
+        --text-mid: #94A3B8;
+        --text-light: #64748B;
+        --border: #334155;
+        --border-light: #1E293B;
+        --code-bg: #0F172A;
+        --code-text: #CDD6F4;
+        --code-border: #334155;
+        --navbar-bg: rgba(15,23,42,.88);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        transition: background .3s, color .3s;
+    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+    .navbar {
+        position: sticky; top: 0; z-index: 100;
+        background: var(--navbar-bg);
+        backdrop-filter: blur(16px);
+        border-bottom: 1px solid var(--border);
+        padding: 12px 0;
+    }
+    .navbar .container {
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+        display: flex; align-items: center; gap: 10px;
+        font-weight: 700; font-size: 1.2rem;
+    }
+    .logo-icon {
+        width: 34px; height: 34px; border-radius: 9px;
+        background: linear-gradient(135deg, #7C3AED, #A78BFA);
+        display: flex; align-items: center; justify-content: center;
+        color: #fff;
+    }
+    .logo span { color: var(--primary); }
+    .theme-toggle {
+        background: var(--border-light); border: 1px solid var(--border);
+        width: 38px; height: 38px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; font-size: 1.05rem;
+    }
+    .tabs {
+        display: flex;
+        gap: 8px;
+        margin: 28px 0 20px;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+    }
+    .tab-btn {
+        background: transparent;
+        border: none;
+        padding: 8px 22px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 30px;
+        cursor: pointer;
+        color: var(--text-mid);
+        transition: all .2s;
+    }
+    .tab-btn.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 2px 8px rgba(124,58,237,.3);
+    }
+    .panel { display: none; animation: fadeIn 0.2s ease; }
+    .panel.active-panel { display: block; }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .tool-card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-sm);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    .card-header {
+        padding: 16px 20px;
+        background: var(--primary-bg);
+        border-bottom: 1px solid var(--border);
+        font-weight: 700;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    .card-body { padding: 20px; }
+    textarea {
+        width: 100%;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        line-height: 1.5;
+        background: var(--code-bg);
+        color: var(--code-text);
+        border: 1px solid var(--code-border);
+        border-radius: 10px;
+        padding: 14px;
+        resize: vertical;
+    }
+    button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .2s;
+        font-size: 0.8rem;
+    }
+    button:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .flex-btns {
+        display: flex;
+        gap: 12px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .error-msg {
+        color: var(--danger);
+        background: var(--danger-bg);
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        border-left: 3px solid var(--danger);
+    }
+    .output-area {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px;
+        max-height: 480px;
+        overflow: auto;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        margin-top: 16px;
+    }
+    .output-area pre { margin: 0; white-space: pre-wrap; word-break: break-word; }
+    .copy-btn-small {
+        background: var(--primary-bg);
+        color: var(--primary);
+        border: 1px solid var(--border);
+        padding: 4px 12px;
+        font-size: 0.7rem;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+    .tree-node { list-style: none; margin-left: 20px; }
+    .tree-node-root { margin-left: 0; }
+    .tree-item {
+        cursor: pointer;
+        padding: 2px 0;
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    .tree-toggle { display: inline-flex; width: 18px; font-weight: bold; color: var(--primary); }
+    .tree-key { color: var(--primary); font-weight: 600; }
+    .tree-value.string { color: var(--accent); }
+    .tree-value.number { color: #FAB387; }
+    .tree-value.boolean { color: #89B4FA; }
+    .tree-value.null { color: var(--text-light); font-style: italic; }
+    .tree-children { display: none; margin-left: 20px; }
+    .tree-children.expanded { display: block; }
+    .preview-badge { font-size: 0.65rem; color: var(--text-light); margin-left: 8px; }
+    .radio-group {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        background: var(--primary-bg);
+        padding: 6px 14px;
+        border-radius: 30px;
+    }
+    .radio-group label {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.75rem;
+        cursor: pointer;
+    }
+    .diff-line { padding: 4px 6px; margin-bottom: 4px; border-radius: 6px; font-family: monospace; }
+    .diff-added { background-color: rgba(5,150,105,0.15); border-left: 3px solid var(--accent); }
+    .diff-removed { background-color: rgba(220,38,38,0.15); border-left: 3px solid var(--danger); }
+    .diff-changed { background-color: rgba(217,119,6,0.15); border-left: 3px solid var(--warn); }
+    footer { text-align: center; padding: 24px 0; border-top: 1px solid var(--border); color: var(--text-light); font-size: 0.75rem; }
+    @media (max-width: 700px) { .tab-btn { padding: 6px 14px; } .radio-group { flex-wrap: wrap; gap: 8px; } }
+  </style>
+</head>
+<body>
+<nav class="navbar"><div class="container"><div class="logo"><div class="logo-icon">{ }</div><div>JSON <span>Toolkit Pro</span></div></div><div class="theme-toggle" id="themeToggle">🌙</div></div></nav>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="viewerFormatter">👁️📐 Viewer + Schema</button>
+    <button class="tab-btn" data-tab="diff">🔄 Diff Checker</button>
+    <button class="tab-btn" data-tab="mock">🎲 Mock Generator</button>
+    <button class="tab-btn" data-tab="infer">🔍 JSON → Schema</button>
+  </div>
+
+  <!-- Combined Viewer + Schema (unchanged) -->
+  <div id="viewerFormatterPanel" class="panel active-panel">
+    <div class="tool-card">
+      <div class="card-header"><span>📂 JSON Viewer</span><button id="copyViewerOutputBtn" class="copy-btn-small">📋 Copy JSON</button></div>
+      <div class="card-body">
+        <textarea id="jsonInput" rows="8" placeholder='Paste JSON...'></textarea>
+        <div class="flex-btns"><button id="formatJsonBtn">🌳 Format & View Tree</button><button id="clearJsonBtn">🗑️ Clear</button></div>
+        <div id="jsonTreeContainer" class="output-area">✨ Enter JSON and click "Format & View Tree"</div>
+      </div>
+    </div>
+    <div class="tool-card">
+      <div class="card-header"><span>📐 JSON Schema Formatter</span><button id="copySchemaOutputBtn" class="copy-btn-small">📋 Copy Schema</button></div>
+      <div class="card-body">
+        <textarea id="schemaInput" rows="8" placeholder='Paste JSON Schema...'></textarea>
+        <div class="flex-btns"><button id="formatSchemaBtn">✨ Format Schema</button><button id="clearSchemaBtn">🗑️ Clear</button></div>
+        <div id="schemaOutput" class="output-area">📄 Paste a schema and click "Format Schema"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diff Panel -->
+  <div id="diffPanel" class="panel">
+    <div class="tool-card">
+      <div class="card-header"><span>🔍 Compare JSONs</span><button id="copyDiffOutputBtn" class="copy-btn-small">📋 Copy Diff</button></div>
+      <div class="card-body">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div><label>Original</label><textarea id="diffLeft" rows="6"></textarea></div>
+          <div><label>Modified</label><textarea id="diffRight" rows="6"></textarea></div>
+        </div>
+        <div class="flex-btns"><button id="computeDiffBtn">🔄 Compute Diff</button><button id="clearDiffBtn">🗑️ Clear</button></div>
+        <div id="diffOutput" class="output-area"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mock Generator with THREE options: All fields, Required only, Random optional -->
+  <div id="mockPanel" class="panel">
+    <div class="tool-card">
+      <div class="card-header"><span>🎲 Mock Generator</span><button id="copyMockOutputBtn" class="copy-btn-small">📋 Copy Mock</button></div>
+      <div class="card-body">
+        <textarea id="schemaForMock" rows="8" placeholder='Enter JSON Schema...'></textarea>
+        <div class="flex-btns">
+          <div class="radio-group">
+            <label><input type="radio" name="fieldMode" value="all" checked> ✅ All fields</label>
+            <label><input type="radio" name="fieldMode" value="required"> 🔒 Required only</label>
+            <label><input type="radio" name="fieldMode" value="random"> 🎲 Random optional</label>
+          </div>
+          <button id="generateMockBtn">⚡ Generate Mock</button>
+          <button id="clearMockBtn">🗑️ Clear</button>
+        </div>
+        <div id="mockOutput" class="output-area">📦 Choose mode and click Generate.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JSON → Schema Inference -->
+  <div id="inferPanel" class="panel">
+    <div class="tool-card">
+      <div class="card-header"><span>🔍 Infer Schema from JSON</span><button id="copyInferOutputBtn" class="copy-btn-small">📋 Copy Schema</button></div>
+      <div class="card-body">
+        <textarea id="sampleJsonInput" rows="10" placeholder='Paste sample JSON...'></textarea>
+        <div class="flex-btns"><button id="inferSchemaBtn">✨ Generate Schema</button><button id="clearInferBtn">🗑️ Clear</button></div>
+        <div id="inferOutput" class="output-area"></div>
+      </div>
+    </div>
+  </div>
+  <footer>JSON Toolkit Pro — Viewer | Schema Formatter | Diff | Mock (All / Required / Random optional) | JSON → Schema</footer>
+</div>
+
+<script>
+  // Theme
+  const themeToggle = document.getElementById('themeToggle');
+  const htmlEl = document.documentElement;
+  if (localStorage.getItem('theme') === 'dark') { htmlEl.setAttribute('data-theme', 'dark'); themeToggle.innerHTML = '☀️'; }
+  themeToggle.onclick = () => {
+    const isDark = htmlEl.getAttribute('data-theme') === 'dark';
+    if (isDark) { htmlEl.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); themeToggle.innerHTML = '🌙'; }
+    else { htmlEl.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); themeToggle.innerHTML = '☀️'; }
+  };
+
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-btn');
+  const panels = {
+    viewerFormatter: document.getElementById('viewerFormatterPanel'),
+    diff: document.getElementById('diffPanel'),
+    mock: document.getElementById('mockPanel'),
+    infer: document.getElementById('inferPanel')
+  };
+  function activateTab(id) { Object.values(panels).forEach(p => p.classList.remove('active-panel')); panels[id].classList.add('active-panel'); tabs.forEach(btn => { if (btn.dataset.tab === id) btn.classList.add('active'); else btn.classList.remove('active'); }); }
+  tabs.forEach(btn => btn.addEventListener('click', () => activateTab(btn.dataset.tab)));
+
+  // Helper: escape HTML
+  function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m])); }
+
+  // ---------- JSON VIEWER (tree) ----------
+  function formatValue(v) {
+    if (v === null) return '<span class="tree-value null">null</span>';
+    if (typeof v === 'boolean') return `<span class="tree-value boolean">${v}</span>`;
+    if (typeof v === 'number') return `<span class="tree-value number">${v}</span>`;
+    if (typeof v === 'string') { let e = escapeHtml(v); if (e.length > 100) e = e.slice(0,100)+'…'; return `<span class="tree-value string">"${e}"</span>`; }
+    return '';
+  }
+  function buildTree(data, keyName = null) {
+    const isArray = Array.isArray(data);
+    if (data === null || typeof data !== 'object') {
+      const li = document.createElement('li'); li.className = 'tree-node';
+      li.innerHTML = `<div class="tree-item">${keyName !== null ? `<span class="tree-key">${escapeHtml(keyName)}</span>: ` : ''}${formatValue(data)}</div>`;
+      return li;
+    }
+    const node = document.createElement('li'); node.className = 'tree-node';
+    const isEmpty = Object.keys(data).length === 0;
+    const toggleSpan = document.createElement('span'); toggleSpan.className = 'tree-toggle'; toggleSpan.textContent = isEmpty ? '' : '▼';
+    const keySpan = document.createElement('span'); keySpan.className = 'tree-key';
+    keySpan.textContent = keyName !== null ? escapeHtml(keyName) + (isArray ? '' : ': ') : (isArray ? 'Array' : 'Object');
+    const preview = document.createElement('span'); preview.className = 'preview-badge';
+    preview.textContent = isArray ? `Array(${data.length})` : `{${Object.keys(data).length}}`;
+    const itemDiv = document.createElement('div'); itemDiv.className = 'tree-item';
+    if (!isEmpty) itemDiv.appendChild(toggleSpan);
+    itemDiv.appendChild(keySpan); itemDiv.appendChild(preview);
+    const children = document.createElement('ul'); children.className = 'tree-children';
+    if (!isEmpty) children.classList.add('expanded');
+    for (const [k, v] of Object.entries(data)) children.appendChild(buildTree(v, isArray ? `[${k}]` : k));
+    node.appendChild(itemDiv); node.appendChild(children);
+    if (!isEmpty) toggleSpan.onclick = (e) => { e.stopPropagation(); children.classList.toggle('expanded'); toggleSpan.textContent = children.classList.contains('expanded') ? '▼' : '▶'; };
+    return node;
+  }
+  let lastJson = '';
+  function renderTree() {
+    const raw = document.getElementById('jsonInput').value.trim();
+    const container = document.getElementById('jsonTreeContainer');
+    if (!raw) { container.innerHTML = '<div class="error-msg">⛔ Enter JSON</div>'; return; }
+    try {
+      const parsed = JSON.parse(raw);
+      const pretty = JSON.stringify(parsed, null, 2);
+      document.getElementById('jsonInput').value = pretty;
+      lastJson = pretty;
+      container.innerHTML = '';
+      const root = document.createElement('ul'); root.className = 'tree-node-root';
+      root.appendChild(buildTree(parsed)); container.appendChild(root);
+    } catch(e) { container.innerHTML = `<div class="error-msg">❌ ${e.message}</div>`; }
+  }
+  document.getElementById('formatJsonBtn').onclick = renderTree;
+  document.getElementById('clearJsonBtn').onclick = () => { document.getElementById('jsonInput').value = ''; document.getElementById('jsonTreeContainer').innerHTML = '✨ Cleared.'; lastJson = ''; };
+  document.getElementById('copyViewerOutputBtn').onclick = () => { if (lastJson) { navigator.clipboard.writeText(lastJson); alert('Copied!'); } else alert('No JSON'); };
+
+  // ---------- SCHEMA FORMATTER (fixed token highlighter) ----------
+  function highlightJSON(jsonStr) {
+    let html = '', i = 0, len = jsonStr.length;
+    while (i < len) {
+      const ch = jsonStr[i];
+      if (ch === '"') {
+        let start = i; i++;
+        while (i < len && jsonStr[i] !== '"') { if (jsonStr[i] === '\\') i++; i++; }
+        i++; const token = jsonStr.substring(start, i);
+        let next = i; while (next < len && /\s/.test(jsonStr[next])) next++;
+        if (next < len && jsonStr[next] === ':') html += `<span style="color: var(--primary-light); font-weight: 600;">${escapeHtml(token)}</span>`;
+        else html += `<span style="color: var(--accent);">${escapeHtml(token)}</span>`;
+      } else if ('{}[]:,'.includes(ch)) { html += escapeHtml(ch); i++; }
+      else if (/\s/.test(ch)) { html += escapeHtml(ch); i++; }
+      else if (/[0-9\-]/.test(ch)) {
+        let start = i; while (i < len && /[0-9eE\.\-+]/.test(jsonStr[i])) i++;
+        html += `<span style="color: #FAB387;">${escapeHtml(jsonStr.substring(start, i))}</span>`;
+      } else if (jsonStr.substr(i,4) === 'true') { html += `<span style="color: #89B4FA;">true</span>`; i+=4; }
+      else if (jsonStr.substr(i,5) === 'false') { html += `<span style="color: #89B4FA;">false</span>`; i+=5; }
+      else if (jsonStr.substr(i,4) === 'null') { html += `<span style="color: var(--text-light); font-style: italic;">null</span>`; i+=4; }
+      else { html += escapeHtml(ch); i++; }
+    }
+    return `<pre style="margin:0;">${html}</pre>`;
+  }
+  let lastFormattedSchema = '';
+  function formatSchema() {
+    const raw = document.getElementById('schemaInput').value.trim();
+    const out = document.getElementById('schemaOutput');
+    if (!raw) { out.innerHTML = '<div class="error-msg">📄 Enter a schema.</div>'; return; }
+    try {
+      const obj = JSON.parse(raw);
+      const pretty = JSON.stringify(obj, null, 2);
+      document.getElementById('schemaInput').value = pretty;
+      lastFormattedSchema = pretty;
+      out.innerHTML = highlightJSON(pretty);
+    } catch(e) { out.innerHTML = `<div class="error-msg">❌ ${e.message}</div>`; }
+  }
+  document.getElementById('formatSchemaBtn').onclick = formatSchema;
+  document.getElementById('clearSchemaBtn').onclick = () => { document.getElementById('schemaInput').value = ''; document.getElementById('schemaOutput').innerHTML = '✨ Cleared.'; lastFormattedSchema = ''; };
+  document.getElementById('copySchemaOutputBtn').onclick = () => { if (lastFormattedSchema) { navigator.clipboard.writeText(lastFormattedSchema); alert('Copied!'); } else alert('No schema'); };
+
+  // ---------- DIFF CHECKER ----------
+  function deepDiff(o1, o2, p = '') {
+    if (o1 === o2) return null;
+    if (typeof o1 !== typeof o2 || o1 === null || o2 === null || typeof o1 !== 'object') return { type: 'change', path: p, old: o1, new: o2 };
+    if (Array.isArray(o1) !== Array.isArray(o2)) return { type: 'change', path: p, old: o1, new: o2 };
+    const keys = new Set([...Object.keys(o1), ...Object.keys(o2)]);
+    const changes = [];
+    for (let k of keys) {
+      const newPath = p ? `${p}.${k}` : k;
+      if (!(k in o1)) changes.push({ type: 'added', path: newPath, value: o2[k] });
+      else if (!(k in o2)) changes.push({ type: 'removed', path: newPath, value: o1[k] });
+      else { const d = deepDiff(o1[k], o2[k], newPath); if (d) { if (Array.isArray(d)) changes.push(...d); else changes.push(d); } }
+    }
+    return changes.length ? changes : null;
+  }
+  function renderDiff(diff) {
+    if (!diff || (Array.isArray(diff) && !diff.length)) return '<div>✅ No differences.</div>';
+    const arr = Array.isArray(diff) ? diff : [diff];
+    let html = '<div><strong>📌 Differences:</strong></div>';
+    for (let c of arr) {
+      if (c.type === 'added') html += `<div class="diff-line diff-added">➕ ADDED at <code>${escapeHtml(c.path)}</code> → ${JSON.stringify(c.value)}</div>`;
+      else if (c.type === 'removed') html += `<div class="diff-line diff-removed">➖ REMOVED at <code>${escapeHtml(c.path)}</code> ← ${JSON.stringify(c.value)}</div>`;
+      else html += `<div class="diff-line diff-changed">🔄 CHANGED at <code>${escapeHtml(c.path)}</code><br>  old: ${JSON.stringify(c.old)}<br>  new: ${JSON.stringify(c.new)}</div>`;
+    }
+    return html;
+  }
+  let lastDiffText = '';
+  function computeDiff() {
+    const leftRaw = document.getElementById('diffLeft').value.trim(), rightRaw = document.getElementById('diffRight').value.trim();
+    const out = document.getElementById('diffOutput');
+    if (!leftRaw && !rightRaw) { out.innerHTML = '<div class="error-msg">⚠️ Enter both JSONs.</div>'; return; }
+    try {
+      const left = leftRaw ? JSON.parse(leftRaw) : null, right = rightRaw ? JSON.parse(rightRaw) : null;
+      const diff = deepDiff(left, right);
+      const html = renderDiff(diff);
+      out.innerHTML = html;
+      lastDiffText = html.replace(/<[^>]*>/g, '');
+      if (leftRaw) document.getElementById('diffLeft').value = JSON.stringify(left, null, 2);
+      if (rightRaw) document.getElementById('diffRight').value = JSON.stringify(right, null, 2);
+    } catch(e) { out.innerHTML = `<div class="error-msg">❌ ${e.message}</div>`; }
+  }
+  document.getElementById('computeDiffBtn').onclick = computeDiff;
+  document.getElementById('clearDiffBtn').onclick = () => { document.getElementById('diffLeft').value = ''; document.getElementById('diffRight').value = ''; document.getElementById('diffOutput').innerHTML = '✨ Cleared.'; };
+  document.getElementById('copyDiffOutputBtn').onclick = () => { if (lastDiffText) { navigator.clipboard.writeText(lastDiffText); alert('Copied!'); } else alert('No diff'); };
+
+  // ---------- MOCK GENERATOR with three modes ----------
+  function generateMockValue(schema, fieldMode) {
+    if (schema === null || schema === undefined) return null;
+    if (schema.enum) return schema.enum[0];
+    if (schema.const !== undefined) return schema.const;
+    if (schema.type === 'string') {
+      if (schema.format === 'email') return 'user@example.com';
+      if (schema.format === 'date-time') return '2025-01-01T00:00:00Z';
+      return 'sample_string';
+    }
+    if (schema.type === 'number' || schema.type === 'integer') {
+      let val = 42;
+      if (schema.minimum !== undefined) val = Math.max(val, schema.minimum);
+      if (schema.maximum !== undefined) val = Math.min(val, schema.maximum);
+      return schema.type === 'integer' ? Math.floor(val) : val;
+    }
+    if (schema.type === 'boolean') return true;
+    if (schema.type === 'array') {
+      const items = schema.items || { type: 'string' };
+      const count = schema.minItems || 1;
+      return Array(count).fill(generateMockValue(items, fieldMode));
+    }
+    if (schema.type === 'object' || schema.properties) {
+      const obj = {};
+      const props = schema.properties || {};
+      const requiredSet = new Set(schema.required || []);
+      for (const [k, ps] of Object.entries(props)) {
+        if (fieldMode === 'all') {
+          obj[k] = generateMockValue(ps, fieldMode);
+        } else if (fieldMode === 'required') {
+          if (requiredSet.has(k)) obj[k] = generateMockValue(ps, fieldMode);
+        } else if (fieldMode === 'random') {
+          // required always included, optional with 50% chance
+          if (requiredSet.has(k)) {
+            obj[k] = generateMockValue(ps, fieldMode);
+          } else {
+            if (Math.random() < 0.5) obj[k] = generateMockValue(ps, fieldMode);
+          }
+        }
+      }
+      return obj;
+    }
+    if (schema.anyOf) return generateMockValue(schema.anyOf[0], fieldMode);
+    if (schema.oneOf) return generateMockValue(schema.oneOf[0], fieldMode);
+    return null;
+  }
+
+  let lastMock = '';
+  function generateMock() {
+    const raw = document.getElementById('schemaForMock').value.trim();
+    const out = document.getElementById('mockOutput');
+    if (!raw) { out.innerHTML = '<div class="error-msg">📌 Enter a JSON Schema.</div>'; return; }
+    try {
+      const schema = JSON.parse(raw);
+      const modeRadio = document.querySelector('input[name="fieldMode"]:checked');
+      const fieldMode = modeRadio ? modeRadio.value : 'all';
+      const mock = generateMockValue(schema, fieldMode);
+      const pretty = JSON.stringify(mock, null, 2);
+      lastMock = pretty;
+      out.innerHTML = `<pre>${escapeHtml(pretty)}</pre>`;
+    } catch(e) { out.innerHTML = `<div class="error-msg">❌ Invalid Schema: ${e.message}</div>`; }
+  }
+  document.getElementById('generateMockBtn').onclick = generateMock;
+  document.getElementById('clearMockBtn').onclick = () => { document.getElementById('schemaForMock').value = ''; document.getElementById('mockOutput').innerHTML = '📦 Cleared.'; lastMock = ''; };
+  document.getElementById('copyMockOutputBtn').onclick = () => { if (lastMock) { navigator.clipboard.writeText(lastMock); alert('Copied!'); } else alert('No mock generated'); };
+
+  // ---------- INFER SCHEMA ----------
+  function inferType(val) {
+    if (val === null) return { type: 'null' };
+    if (typeof val === 'string') return { type: 'string' };
+    if (typeof val === 'number') return { type: 'number' };
+    if (typeof val === 'boolean') return { type: 'boolean' };
+    if (Array.isArray(val)) {
+      if (val.length === 0) return { type: 'array', items: {} };
+      let items = inferType(val[0]);
+      for (let i = 1; i < val.length; i++) items = mergeSchemas(items, inferType(val[i]));
+      return { type: 'array', items };
+    }
+    if (typeof val === 'object') {
+      const props = {};
+      for (const [k, v] of Object.entries(val)) props[k] = inferType(v);
+      return { type: 'object', properties: props };
+    }
+    return { type: 'string' };
+  }
+  function mergeSchemas(a, b) {
+    if (a.type !== b.type) return { type: 'string' };
+    if (a.type === 'object' && b.type === 'object') {
+      const props = { ...(a.properties || {}), ...(b.properties || {}) };
+      for (let k in props) if (a.properties?.[k] && b.properties?.[k]) props[k] = mergeSchemas(a.properties[k], b.properties[k]);
+      return { type: 'object', properties: props };
+    }
+    if (a.type === 'array' && b.type === 'array') return { type: 'array', items: mergeSchemas(a.items || {}, b.items || {}) };
+    return a;
+  }
+  let lastInferred = '';
+  function inferSchema() {
+    const raw = document.getElementById('sampleJsonInput').value.trim();
+    const out = document.getElementById('inferOutput');
+    if (!raw) { out.innerHTML = '<div class="error-msg">📌 Paste a JSON sample.</div>'; return; }
+    try {
+      const sample = JSON.parse(raw);
+      const schema = inferType(sample);
+      const full = { $schema: "http://json-schema.org/draft-07/schema#", ...schema };
+      const pretty = JSON.stringify(full, null, 2);
+      lastInferred = pretty;
+      out.innerHTML = `<pre>${escapeHtml(pretty)}</pre>`;
+    } catch(e) { out.innerHTML = `<div class="error-msg">❌ Invalid JSON: ${e.message}</div>`; }
+  }
+  document.getElementById('inferSchemaBtn').onclick = inferSchema;
+  document.getElementById('clearInferBtn').onclick = () => { document.getElementById('sampleJsonInput').value = ''; document.getElementById('inferOutput').innerHTML = '📌 Cleared.'; lastInferred = ''; };
+  document.getElementById('copyInferOutputBtn').onclick = () => { if (lastInferred) { navigator.clipboard.writeText(lastInferred); alert('Copied!'); } else alert('No schema'); };
+
+  // Preload examples
+  document.getElementById('jsonInput').value = JSON.stringify({ project: "API Tests", version: "2.0", methods: ["GET","POST"] }, null, 2);
+  renderTree();
+  document.getElementById('schemaInput').value = JSON.stringify({ $schema: "http://json-schema.org/draft-07/schema#", type: "object", properties: { name: { type: "string" }, age: { type: "integer" } }, required: ["name"] }, null, 2);
+  formatSchema();
+  document.getElementById('diffLeft').value = JSON.stringify({ id: 1, title: "Toolkit", author: "Dev" }, null, 2);
+  document.getElementById('diffRight').value = JSON.stringify({ id: 1, title: "Toolkit Pro", author: "Dev Team", newField: "added" }, null, 2);
+  const mockSchemaExample = {
+    type: "object",
+    properties: {
+      userId: { type: "integer", minimum: 100, maximum: 999 },
+      username: { type: "string" },
+      email: { type: "string", format: "email" },
+      role: { type: "string", enum: ["admin", "user"] },
+      optionalField1: { type: "string" },
+      optionalField2: { type: "boolean" }
+    },
+    required: ["userId", "username"]
+  };
+  document.getElementById('schemaForMock').value = JSON.stringify(mockSchemaExample, null, 2);
+  document.getElementById('sampleJsonInput').value = JSON.stringify({ id: "0001", type: "donut", name: "Cake", ppu: 0.55, batters: { batter: [{ id: "1001", type: "Regular" }] } }, null, 2);
+</script>
+</body>
+</html>
